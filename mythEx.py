@@ -135,20 +135,17 @@ def main():
             # MythTV's mythcommflag can be used to remove commercials,
             # shrinking recordings and improving viewing.
             if config.avconv_mythcommflag_enabled is True:
-                run_mythcommflag()
+                run_mythcommflag(source_path)
 
             # Re-encode with avconv
-            run_avconv()
+            run_avconv(source_path, link_path)
             
         elif config.avconv_remux_enabled:
-            run_avconv_remux()
+            run_avconv_remux(source_path, link_path)
 
         else:
-            print "Linking " + source_path + " ==> " + output_path
-            os.symlink(source_path, output_path)
-
-        print "[INFO] Linking " + source_path + " ==> " + link_path
-        os.symlink(source_path, link_path)
+            print "[INFO] Linking " + source_path + " ==> " + link_path
+            os.symlink(source_path, link_path)
     close_library(lib)
 
 def close_library(lib):
@@ -161,7 +158,7 @@ def close_library(lib):
     library.write(outstring)
     library.close()
 
-def run_mythcommflag():
+def run_mythcommflag(source_path):
     mythcommflag_command = 'mythcommflag -f '
     mythcommflag_command += source_path
     mythcommflag_command += ' --outputfile ~/.mythExCommflag.edl'
@@ -170,8 +167,7 @@ def run_mythcommflag():
         mythcommflag_command += ' -v'
     os.system(mythcommflag_command)
 
-
-def run_avconv():
+def run_avconv(source_path, output_path):
     avconv_command = "nice -n " + str(avconv_nicevalue)
     avconv_command += " avconv -i " + source_path
     avconv_command += " -itsoffset " + str(avconv_audio_offset)
@@ -194,7 +190,7 @@ def run_avconv():
     print "Running avconv with command line " + avconv_command
     os.system(avconv_command)
 
-def run_avconv_remux():
+def run_avconv_remux(source_path, output_path):
     avconv_command = "avconv -i " + source_path + " -c copy \"" + output_path + "\""
     print "Running avconv remux with command " + avconv_command
     os.system(avconv_command)
